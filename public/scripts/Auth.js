@@ -7,7 +7,7 @@ const Auth = {
 	postLogin: async (response, credentials) => {
 		if (response.ok) {
 			Auth.isLoggedIn = true;
-			Auth.account = { ...response.user };
+			Auth.account = { ...credentials };
 			Auth.updateStatus();
 			Router.go("/account");
 		} else {
@@ -32,8 +32,10 @@ const Auth = {
 	autoLogin: async () => {
 		if (window.PasswordCredential) {
 			const credentials = await navigator.credentials.get({ password: true });
-			document.getElementById("login_email").value = credentials.id;
-			document.getElementById("login_password").value = credentials.password;
+			if (credentials) {
+				document.getElementById("login_email").value = credentials.id;
+				document.getElementById("login_password").value = credentials.password;
+			}
 		}
 	},
 	login: async (event) => {
@@ -46,8 +48,15 @@ const Auth = {
 
 		if (credentials.email && credentials.password) {
 			const response = await API.login(credentials);
-			Auth.postLogin(response, credentials);
+			Auth.postLogin(response, response.user);
 		}
+	},
+	loginFromGoogle: async (data) => {
+		const response = await API.loginFromGoogle(data);
+		Auth.postLogin(response, {
+			name: response.name,
+			email: response.email,
+		});
 	},
 	register: async (event) => {
 		event.preventDefault();
