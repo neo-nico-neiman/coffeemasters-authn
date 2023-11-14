@@ -80,14 +80,21 @@ function loginFromGoogle(data) {
         <section class="page" id="login">
             <h2>Log In</h2>
 
-            <form id="formLogin" onsubmit="Auth.login(event)">
+            <form id="formLogin" onsubmit="Auth.login(event)" >
                 <fieldset>
                     <label for="login_username">Username</label>
 
                     <input autocomplete="username" id="login_email"
-                        required>      
-                    <label for="login_password">Password</label>
-                    <input type="password" id="login_password" autocomplete="current-password">
+                        required>  
+
+                        <section hidden id="login_section_password">
+                            <label for="login_password">Password</label>
+                            <input type="password" id="login_password" autocomplete="current-password">
+                        </section>
+
+                        <section hidden id="login_section_webauthn">
+                            webauthn
+                        </section>
                 </fieldset>
                 <button>Continue</button>
 
@@ -105,6 +112,7 @@ function loginFromGoogle(data) {
                 data-ux_mode="popup"
                 data-callback="loginFromGoogle"
                 data-auto_select="false"
+                data-auto_prompt="false"
                 data-itp_support="false">
             </div>
             

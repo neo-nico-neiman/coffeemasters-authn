@@ -53,6 +53,19 @@ app.post("/auth/login", (req, res) => {
 		.send({ ok: true, user: { name: user.name, email: user.email } });
 });
 
+app.post("/auth/auth-options", (req, res) => {
+	const foundUser = findUser(req.email);
+	if (foundUser) {
+		res.send({
+			password: !!foundUser.password,
+			google: !!foundUser.federated?.google,
+			webauthn: !!foundUser.webauthn,
+		});
+	} else {
+		res.status(200).send({ password: true });
+	}
+});
+
 app.post("/auth/register", (req, res) => {
 	const { name, email, password } = req.body;
 

@@ -1,5 +1,8 @@
 const API = {
 	endpoint: "/auth/",
+	checkAuthOptions: async (user) => {
+		return await API.makePostRequest(API.endpoint + "auth-options", user);
+	},
 	login: async (user) => {
 		return await API.makePostRequest(API.endpoint + "login", user);
 	},

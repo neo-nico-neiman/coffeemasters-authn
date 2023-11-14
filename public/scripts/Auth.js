@@ -10,23 +10,22 @@ const Auth = {
 			Auth.account = { ...credentials };
 			Auth.updateStatus();
 			Router.go("/account");
+			// Credential management API storage to ahcieve auto login
+			if (window.PasswordCredential && credentials.password) {
+				const credentialsToStore = new PasswordCredential({
+					id: credentials.email,
+					password: credentials.password,
+					name: credentials.email,
+				});
+
+				try {
+					navigator.credentials.store(credentialsToStore);
+				} catch {
+					console.log("Error"); // TODO: improve
+				}
+			}
 		} else {
 			alert(response.message);
-		}
-
-		// Credential management API storage to ahcieve auto login
-		if (window.PasswordCredential && credentials.password) {
-			const credentialsToStore = new PasswordCredential({
-				id: credentials.email,
-				password: credentials.password,
-				name: credentials.email,
-			});
-
-			try {
-				navigator.credentials.store(credentialsToStore);
-			} catch {
-				console.log("Error"); // TODO: improve
-			}
 		}
 	},
 	autoLogin: async () => {
@@ -41,14 +40,20 @@ const Auth = {
 	login: async (event) => {
 		event.preventDefault();
 
-		const credentials = {
-			email: document.getElementById("login_email").value,
-			password: document.getElementById("login_password").value,
-		};
+		if (Auth.loginStep == 1) {
+			Auth.checkAuthOptions();
+		}
 
-		if (credentials.email && credentials.password) {
-			const response = await API.login(credentials);
-			Auth.postLogin(response, response.user);
+		if (Auth.loginStep == 2) {
+			const credentials = {
+				email: document.getElementById("login_email").value,
+				password: document.getElementById("login_password").value,
+			};
+
+			if (credentials.email && credentials.password) {
+				const response = await API.login(credentials);
+				Auth.postLogin(response, response.user);
+			}
 		}
 	},
 	loginFromGoogle: async (data) => {
@@ -105,7 +110,26 @@ const Auth = {
 				.forEach((e) => (e.style.display = "none"));
 		}
 	},
-	init: () => {},
+	loginStep: 1,
+	checkAuthOptions: async () => {
+		const response = await API.checkAuthOptions({
+			email: document.getElementById("login_email").value,
+		});
+
+		Auth.loginStep = 2;
+
+		if (response.password) {
+			document.getElementById("login_section_password").hidden = false;
+		}
+
+		if (response.webauthn) {
+			document.getElementById("login_section_webauthn").hidden = false;
+		}
+	},
+	init: () => {
+		document.getElementById("login_section_password").hidden = true;
+		document.getElementById("login_section_webauthn").hidden = true;
+	},
 };
 Auth.updateStatus();
 Auth.autoLogin();
