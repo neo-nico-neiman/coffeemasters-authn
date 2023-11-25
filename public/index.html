@@ -23,7 +23,7 @@ function loginFromGoogle(data) {
     Auth.loginFromGoogle(data)
 }
 </script>
-
+<script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
 </head>
 
 <body>
@@ -138,6 +138,7 @@ function loginFromGoogle(data) {
                 <dd class="account_username"></dd>
             </dl>
 
+            <button onclick="Auth.addWebAuthn()">Add Authenticator / Passkey</button>
             <button onclick="Auth.logout()">Log out</button>
         </section>
     </main>

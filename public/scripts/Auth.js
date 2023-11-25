@@ -37,6 +37,24 @@ const Auth = {
 			}
 		}
 	},
+	addWebAuthn: async () => {
+		const options = await API.webAuthn.registrationOptions();
+		options.authenticatorSelection.residentKey = "required"; // Useful for passkeys
+		options.authenticatorSelection.requireResidentKey = "required"; // Useful for passkeys
+		options.extensions = {
+			credProps: true,
+		};
+		const authRes = await SimpleWebAuthnBrowser.startRegistration(options);
+		const verificationRes = await API.webAuthn.registrationVerification(
+			authRes
+		);
+
+		if (verificationRes.ok) {
+			alert("You can now login with WebAuthn");
+		} else {
+			alert("Something went wrong please try again");
+		}
+	},
 	login: async (event) => {
 		event.preventDefault();
 
